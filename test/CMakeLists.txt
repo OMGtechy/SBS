@@ -22,10 +22,12 @@ ExternalProject_Add(
 
 link_directories(${GTEST_LIB})
 
+find_package(Threads REQUIRED)
+
 list(APPEND CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra -Wpedantic -Werror")
 
 add_executable(SBS_TEST source/test_sbs_unscoped_stack_vector.cpp)
 target_include_directories(SBS_TEST PRIVATE include ../include ${GTEST_INC})
 add_dependencies(SBS_TEST googletest_test)
 
-target_link_libraries(SBS_TEST gtest gtest_main)
+target_link_libraries(SBS_TEST Threads::Threads gtest gtest_main)

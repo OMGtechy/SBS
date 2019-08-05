@@ -24,10 +24,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED 17)
 
 link_directories(${GBNCH_LIB})
 
+find_package(Threads REQUIRED)
+
 list(APPEND CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra -Wpedantic -Werror")
 
 add_executable(SBS_BENCHMARK source/benchmark_sbs_unscoped_stack_vector.cpp)
 target_include_directories(SBS_BENCHMARK PRIVATE ../include ${GBNCH_INC})
 add_dependencies(SBS_BENCHMARK googlebenchmark_benchmark)
 
-target_link_libraries(SBS_BENCHMARK benchmark "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.16299.0/um/x64/ShLwApi.Lib")
+if(WIN32)
+    target_link_libraries(SBS_BENCHMARK benchmark "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.16299.0/um/x64/ShLwApi.Lib")
+else(WIN32)
+    target_link_libraries(SBS_BENCHMARK benchmark Threads::Threads)
+endif(WIN32)
