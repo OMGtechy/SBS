@@ -10,6 +10,24 @@
 #include <cassert>
 #endif // SBS_ENABLE_DEBUG_ASSERTIONS
 
+#ifdef WIN32
+#pragma comment ( lib, "Shlwapi.lib" )
+#if (_MSC_VER >= 1910)
+// I heard different things about the effects of __forceinline, the best source being:
+// https://devblogs.microsoft.com/cppblog/visual-studio-2017-throughput-improvements-and-advice/
+// "The back end of the compiler takes __forceinline very, very seriously. It’s exempt from all
+// inline budget checks (the cost of a __forceinline function doesn’t even count against the inline budget)
+// and is always honored."
+// The article is about VS 2017, so I assume it works as intended from that point onwards.
+// See the unscoped_stack_vector constructor for why inlining is so important here.
+#define FORCE_INLINE __forceinline
+#else
+#error "Unsupported MSVC version!"
+#endif
+#else
+#define FORCE_INLINE __attribute__((always_inline)) inline
+#endif
+
 #include <new>
 #include <sstream>
 
@@ -31,8 +49,8 @@ namespace sbs {
         //!         ends, so be very careful of putting this inside a loop (you may get a stack overflow / worse).
         //! \param  capacity  The maximum capacity of the array. If this is 0, the behaviour is undefined.
         //!                   You should also be careful not to blow your stack!
-        __attribute__((always_inline))
-        explicit constexpr inline unscoped_stack_vector(const size_type max_size) noexcept
+		FORCE_INLINE
+        explicit constexpr unscoped_stack_vector(const size_type max_size) noexcept
         : m_data(static_cast<value_type*>(alloca(max_size * sizeof(value_type)))),
           m_max_size(max_size),
           m_size(0) {
@@ -49,8 +67,8 @@ namespace sbs {
         //! \brief  Creates an instance of dynarray with an initial size.
         //! \note   See the other constructor for the rest of the documentation.
         //! \param  initial_size  The initial size to use.
-        __attribute__((always_inline))
-        explicit constexpr inline unscoped_stack_vector(const size_type max_size,
+		FORCE_INLINE
+        explicit constexpr unscoped_stack_vector(const size_type max_size,
                                                         const size_type initial_size) noexcept(std::is_nothrow_default_constructible_v<value_type>)
         : unscoped_stack_vector(max_size)
         {
