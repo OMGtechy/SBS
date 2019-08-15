@@ -11,6 +11,12 @@ TYPED_TEST_CASE(USVTest, IntegerTypes);
 
 using sbs::unscoped_stack_vector;
 
+#ifdef WIN32
+#define NEVER_INLINE __declspec(noinline)
+#else
+#define NEVER_INLINE __attribute__((noinline))
+#endif
+
 struct Base
 {
     int32_t data;
@@ -126,7 +132,7 @@ TYPED_TEST(USVTest, Capacity10PushBack) {
     ASSERT_EQ(instance[1], TypeParam{4});
 }
 
-__attribute__((noinline))
+NEVER_INLINE
 void allocate_one(const size_t size) {
     unscoped_stack_vector<uint64_t> instance(size);
 }
