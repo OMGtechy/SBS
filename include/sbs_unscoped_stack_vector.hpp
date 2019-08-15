@@ -184,7 +184,7 @@ namespace sbs {
         }
 
     private:
-        constexpr void at_bounds_check(const size_type index) const
+        void at_bounds_check(const size_type index) const
         {
             // TODO: likely() unlikely()?
             if(!(index < size())) {
